@@ -1,0 +1,98 @@
+[root@localhost ~]# cd /opt/liux/liuxdb/
+[root@localhost liuxdb]# pwd
+/opt/liux/liuxdb
+[root@localhost liuxdb]# ll
+total 4
+-rw-r--r--. 1 root root 2234 Dec  5 10:45 my.cnf
+
+mkdir /opt/liux/liuxdb/tmp
+mkdir /opt/liux/liuxdb/data
+mkdir /opt/liux/liuxdb/binlog
+mkdir /opt/liux/liuxdb/innodb_ts
+mkdir /opt/liux/liuxdb/innodb_log
+
+chown -R mysql:mysql /opt/liux/liuxdb
+chmod 664 /opt/liux/liuxdb/my.cnf
+
+mysqld --defaults-file=/opt/liux/liuxdb/my.cnf --initialize-insecure
+
+mysqld --defaults-file=/opt/liux/liuxdb/my.cnf &
+
+mysql -uroot -S /opt/liux/liuxdb/mysql.sock
+
+alter user 'root'@'localhost' identified by 'Liux@2513';
+
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost 'WITH GRANT OPTION;
+
+CREATE USER 'liux'@'localhost' IDENTIFIED BY 'Liux@2513';
+
+GRANT ALL PRIVILEGES ON *.* TO 'liux'@'localhost'WITH GRANT OPTION;
+
+CREATE USER 'liux'@'%' IDENTIFIED BY 'Liux@2513';
+
+GRANT ALL PRIVILEGES ON *.* TO 'liux'@'%'WITH GRANT OPTION;
+
+FLUSH PRIVILEGES;
+
+mysql> SELECT User, Host FROM mysql.user;
++------------------+-----------+
+| User             | Host      |
++------------------+-----------+
+| liux             | %         |
+| liux             | localhost |
+| mysql.infoschema | localhost |
+| mysql.session    | localhost |
+| mysql.sys        | localhost |
+| root             | localhost |
++------------------+-----------+
+6 rows in set (0.00 sec)
+
+CREATE DATABASE `ry-vue` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+
+
+mysql -u liux -h 127.0.0.1 -P 10138 -p
+mysql -u liux -h 192.168.3.54 -P 10138 -p
+
+Liux@2513
+
+mysql> use ry-vue
+Database changed
+mysql> source /opt/liux/ry_20240629.sql
+
+注意sql头部添加：
+SET NAMES utf8mb4;
+
+
+https://cloud.tencent.com/developer/article/2405226
+MySQL 8 Public Key Retrieval is not allowed 错误的解决方法
+
+在MySQL 8中，出现"Public Key Retrieval is not allowed"错误通常是由于MySQL连接的加密设置引起的。这通常涉及到使用SSL/TLS进行加密连接，而客户端无法正确处理公钥检索。
+jdbc:mysql://localhost:3306/your_database?allowPublicKeyRetrieval=true
+如果您的MySQL服务器已配置为要求SSL/TLS连接，请确保您的客户端驱动程序支持并正确配置了SSL/TLS选项。您可能需要提供正确的SSL证书和密钥文件。
+GRANT USAGE ON *.* TO 'your_user'@'your_host' REQUIRE SSL;
+
+## 内网
+/opt/ghgl/redis-stack-server-7.2.0-v11/bin/redis-server /opt/ghgl/redis/redis.conf &
+## 外网
+/opt/redis/redis-stable/src/redis-server /opt/liux/redis/redis.conf &
+
+port 10139
+
+
+[ydkf@localhost redis]$ cd /opt/ghgl/redis-stack-server-7.2.0-v11/bin/
+[ydkf@localhost bin]$ ./redis-cli -h 127.0.0.1 -p 10139
+127.0.0.1:15379> config get requirepass
+1) "requirepass"
+2) ""
+127.0.0.1:15379> config set requirepass Liux@2510
+OK
+127.0.0.1:15379> exit
+[root@localhost src]# ./redis-cli -h 192.168.3.54 -p 10139
+192.168.3.54:10139> auth Liux@2510
+OK
+192.168.3.54:10139> config get requirepass
+1) "requirepass"
+2) "Liux@2510"
+192.168.3.54:10139> exit
+[root@localhost src]# 
+
