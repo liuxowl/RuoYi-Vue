@@ -54,6 +54,12 @@
             <artifactId>ruoyi-generator</artifactId>
         </dependency>
 
+        <!-- 财务模块-->
+        <dependency>
+            <groupId>com.liux.finance</groupId>
+            <artifactId>liux-finance</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
